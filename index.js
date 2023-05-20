@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 
 // middleware 
@@ -30,6 +30,21 @@ async function run() {
 
     const toyCollection = client.db('handyToy').collection('toys');
 
+    const indexKeys = { seller: 1 };
+    const indexOptions = { name: 'name' };
+    const result = await toyCollection.createIndex(indexKeys, indexOptions);
+
+    app.get('/toysearch/:text', async (req, res) => {
+      const search = req.params.text;
+      const result = await toyCollection.find({
+        $or: [
+          { seller: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: "i" } }
+        ],
+      }).toArray();
+      res.send(result)
+    })
+
     app.get('/allToys', async (req, res) => {
       const cursor = toyCollection.find();
       const result = await cursor.toArray();
@@ -49,7 +64,6 @@ async function run() {
       console.log(req.params.email);
       res.send(result);
     });
-    
 
   } finally {
 
