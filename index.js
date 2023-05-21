@@ -34,6 +34,7 @@ async function run() {
     const indexOptions = { name: 'name' };
     const result =  toyCollection.createIndex(indexKeys, indexOptions);
 
+    // toy search ---------------------------------------------------------------
     app.get('/toysearch/:text', async (req, res) => {
       const search = req.params.text;
       const result = await toyCollection.find({
@@ -45,6 +46,7 @@ async function run() {
       res.send(result)
     })
 
+        // all toys ---------------------------------------------------------------
     app.get('/allToys', async (req, res) => {
       const cursor = toyCollection.find().limit(20);
       const result = await cursor.toArray();
@@ -54,6 +56,7 @@ async function run() {
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
+        // category details ---------------------------------------------------------------
     app.get("/catedetails/:id", async (req, res) => {
       const id = req.params.id;
       const result = await toyCollection.findOne({ _id: new ObjectId(id) });
@@ -64,6 +67,7 @@ async function run() {
       }
     });
 
+        // all toy details ---------------------------------------------------------------
     app.get("/alltoydetails/:id", async (req, res) => {
       const id = req.params.id;
       const result = await toyCollection.findOne({ _id: new ObjectId(id) });
@@ -74,19 +78,21 @@ async function run() {
       }
     });
     
-
+    // add toy ---------------------------------------------------------------
     app.post('/addToys', async (req, res) => {
       const body = req.body;
       const result = await toyCollection.insertOne(body);
       res.send(result)
     });
 
-    app.get('/myToys/:email', async (req, res) => {
-      const result = await toyCollection.find({ email: req.params.email }).toArray();
-      console.log(req.params.email);
+        // my toys ---------------------------------------------------------------
+    app.get('/myToys/:id', async (req, res) => {
+      const result = await toyCollection.find({ email: req.params.id }).sort({price: -1}).toArray();
+      console.log(req.params.id);
       res.send(result);
     });
 
+        // update toy ---------------------------------------------------------------
     app.put('/updatetoy/:id' , async(req, res) => {
       const id = req.params.id;
       const body = req.body;
@@ -102,6 +108,7 @@ async function run() {
       res.send(result)
     });
 
+        // delete toy  ---------------------------------------------------------------
     app.delete('/deletetoy/:id' , async(req, res) => {
       const id = req.params.id;
       const query = {_id: new ObjectId(id)}
