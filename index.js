@@ -54,6 +54,27 @@ async function run() {
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
+    app.get("/catedetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await toyCollection.findOne({ _id: new ObjectId(id) });
+      if (result) {
+        res.send(result);
+      } else {
+        res.status(400).json({ status: 400, message: "No Data Found" });
+      }
+    });
+
+    app.get("/alltoydetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const result = await toyCollection.findOne({ _id: new ObjectId(id) });
+      if (result) {
+        res.send(result);
+      } else {
+        res.status(400).json({ status: 400, message: "No Data Found" });
+      }
+    });
+    
+
     app.post('/addToys', async (req, res) => {
       const body = req.body;
       const result = await toyCollection.insertOne(body);
@@ -80,6 +101,13 @@ async function run() {
       const result = await toyCollection.updateOne(filter, updatetoy);
       res.send(result)
     });
+
+    app.delete('/deletetoy/:id' , async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await toyCollection.deleteOne(query);
+      res.send(result);
+    })
 
   } finally {
 
